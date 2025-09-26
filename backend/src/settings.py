@@ -23,5 +23,14 @@ class RedisSettings(CustomBaseSettings):
     REDIS_PASSWORD: str
 
 
+class JWTSettings(CustomBaseSettings):
+    JWT_PUBLIC_KEY: str
+    JWT_PRIVATE_KEY: str
+    JWT_ALGORITHM: str
+    JWT_ACCESS_TOKEN_MINUTES_EXPIRES: int
+    JWT_REFRESH_TOKEN_DAYS_EXPIRES: int
+
+
 database_settings = DatabaseSettings()
 redis_settings = RedisSettings()
+jwt_settings = JWTSettings()
