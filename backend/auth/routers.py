@@ -21,3 +21,7 @@ async def registration_user(user_data: UserRegistrationSchema, request: Request,
 @limiter.limit('10/minute')
 async def login_user(user_data: UserLoginSchema, request: Request, response: Response, auth_service: AuthService = Depends(get_auth_service)):
     return await auth_service.authentication(user_data, response)
+
+@auth_router.post('/logout')
+async def logout_user(request: Request, response: Response, auth_service: AuthService = Depends(get_auth_service)):
+    return await auth_service.logout(request, response)

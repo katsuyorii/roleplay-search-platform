@@ -1,4 +1,4 @@
-from fastapi import Response
+from fastapi import Response, Request
 
 from time import time
 
@@ -6,13 +6,13 @@ from datetime import datetime, timezone, timedelta
 
 from src.settings import jwt_settings
 from core.utils.password import hashing_password, verify_password
-from core.utils.jwt import create_jwt_token
+from core.utils.jwt import create_jwt_token, verify_jwt_token
 from core.repositories.redis_base import RedisBaseRepository
 from users.models import UserModel
 from users.repositories import UsersRepository
 
 from .schemas import AccessTokenResponseSchema, UserRegistrationSchema, UserLoginSchema
-from .exceptions import EmailAlreadyRegistered, EmailOrPasswordIncorrect
+from .exceptions import EmailAlreadyRegistered, EmailOrPasswordIncorrect, TokenMissing, TokenBlacklisted
 
 
 class BlacklistTokensService:
@@ -55,8 +55,8 @@ class JWTTokensService:
             key='refresh_token',
             value=value,
             expires=datetime.now(timezone.utc) + timedelta(days=self.__refresh_token_days_expires),
-            secure=True,
-            httponly=True,
+            secure=False,
+            httponly=False,
             samesite='strict',
         )
 
@@ -105,3 +105,20 @@ class AuthService:
         await self.users_repository.update(user, {'last_login': datetime.now(timezone.utc)})
 
         return AccessTokenResponseSchema(access_token=access_token)
+    
+    async def logout(self, request: Request, response: Response) -> dict[str, str]:
+        refresh_token = request.cookies.get('refresh_token')
+
+        if refresh_token is None:
+            raise TokenMissing()
+        
+        payload = verify_jwt_token(refresh_token)
+
+        if await self.blacklist_tokens_service.is_token_blacklisted(payload):
+            raise TokenBlacklisted()
+
+        await self.blacklist_tokens_service.set_token_to_blacklist(payload)
+
+        response.delete_cookie('refresh_token')
+
+        return {'message': 'User successfully logged out'}
