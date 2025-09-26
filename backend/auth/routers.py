@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Request
+
+from src.limiter import limiter
 
 from .services import AuthService
 from .dependencies import get_auth_service
@@ -11,5 +13,6 @@ auth_router = APIRouter(
 )
 
 @auth_router.post('/registration', response_model=UserCreatedResponse, status_code=status.HTTP_201_CREATED)
-async def registration_user(user_data: UserRegistrationSchema, auth_service: AuthService = Depends(get_auth_service)):
+@limiter.limit('5/minute')
+async def registration_user(user_data: UserRegistrationSchema, request: Request, auth_service: AuthService = Depends(get_auth_service)):
     return await auth_service.registration(user_data)
