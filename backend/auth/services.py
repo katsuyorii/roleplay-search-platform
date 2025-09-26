@@ -1,14 +1,46 @@
-from core.utils.password import hashing_password
+from fastapi import Response
+
+from datetime import datetime, timezone, timedelta
+
+from src.settings import jwt_settings
+from core.utils.password import hashing_password, verify_password
+from core.utils.jwt import create_jwt_token
 from users.models import UserModel
 from users.repositories import UsersRepository
 
-from .schemas import UserRegistrationSchema
-from .exceptions import EmailAlreadyRegistered
+from .schemas import AccessTokenResponseSchema, UserRegistrationSchema, UserLoginSchema
+from .exceptions import EmailAlreadyRegistered, EmailOrPasswordIncorrect
 
+
+class JWTTokensService:
+    def __init__(self, access_token_minutes_expires: int = jwt_settings.JWT_ACCESS_TOKEN_MINUTES_EXPIRES, refresh_token_days_expires: int = jwt_settings.JWT_REFRESH_TOKEN_DAYS_EXPIRES):
+        self.__access_token_minutes_expires = access_token_minutes_expires
+        self.__refresh_token_days_expires = refresh_token_days_expires
+    
+    def create_access_token(self, payload: dict) -> str:
+        access_token = create_jwt_token(payload, timedelta(minutes=self.__access_token_minutes_expires))
+
+        return access_token
+    
+    def create_refresh_token(self, payload: dict) -> str:
+        refresh_token = create_jwt_token(payload, timedelta(days=self.__refresh_token_days_expires))
+
+        return refresh_token
+    
+    def set_refresh_token_to_cookies(self, value: str, response: Response) -> None:
+        response.set_cookie(
+            key='refresh_token',
+            value=value,
+            expires=datetime.now(timezone.utc) + timedelta(days=self.__refresh_token_days_expires),
+            secure=True,
+            httponly=True,
+            samesite='strict',
+        )
 
 class AuthService:
-    def __init__(self, users_repository: UsersRepository):
+    def __init__(self, users_repository: UsersRepository, jwt_tokens_service: JWTTokensService):
         self.users_repository = users_repository
+        self.jwt_tokens_service = jwt_tokens_service
     
     async def registration(self, user_data: UserRegistrationSchema) -> UserModel:
         user = await self.users_repository.get_by_email(user_data.email)
@@ -26,3 +58,25 @@ class AuthService:
         created_user = await self.users_repository.create(user_data_dict)
 
         return created_user
+    
+    async def authentication(self, user_data: UserLoginSchema, response: Response) -> AccessTokenResponseSchema:
+        user = await self.users_repository.get_by_email(user_data.email)
+
+        if user is None or not verify_password(user_data.password, user.password):
+            raise EmailOrPasswordIncorrect()
+        
+        # ----------------------
+        # Проверка на активированную учетную запись (после добавления Celery + RabbitMQ)
+        # if not user.is_active
+        # ----------------------
+
+        paylaod = {'sub': str(user.id)}
+
+        access_token = self.jwt_tokens_service.create_access_token(paylaod)
+        refresh_token = self.jwt_tokens_service.create_refresh_token(paylaod)
+
+        self.jwt_tokens_service.set_refresh_token_to_cookies(refresh_token, response)
+
+        await self.users_repository.update(user, {'last_login': datetime.now(timezone.utc)})
+
+        return AccessTokenResponseSchema(access_token=access_token)
