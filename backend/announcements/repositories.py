@@ -1,6 +1,7 @@
 import uuid
 
-from sqlalchemy import select, any_
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.repositories.database_base import DatabaseBaseRepository
@@ -34,6 +35,11 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         self.fandoms_repository = fandoms_repository
         self.tags_repository = tags_repository
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
+    
+    async def get_all(self, skip: int = 0, limit: int = 10) -> list[AnnouncementModel]:
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).offset(skip).limit(limit))
+
+        return result.scalars().all()
 
     async def create(self, obj_dict: dict) -> AnnouncementModel:
         obj = self.model(**obj_dict)

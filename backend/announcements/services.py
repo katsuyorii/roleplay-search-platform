@@ -10,6 +10,11 @@ class AnnouncementsService:
         self.announcements_repository = announcements_repository
         self.current_user = current_user
     
+    async def get_all(self) -> list[AnnouncementModel]:
+        announcements = await self.announcements_repository.get_all()
+
+        return announcements
+    
     async def create(self, announcement_data: AnnouncementCreateSchema) -> AnnouncementModel:
         announcement_data_dict = announcement_data.model_dump(exclude_unset=True)
         announcement_data_dict['user_id'] = self.current_user.id
