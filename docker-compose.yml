@@ -15,6 +15,18 @@ services:
       timeout: 5s
       retries: 5
   
+  db_browser:
+    image: dpage/pgadmin4:9.8
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+  
   cache:
     image: redis:8
     container_name: redis

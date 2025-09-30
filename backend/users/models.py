@@ -1,11 +1,12 @@
 from sqlalchemy import String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from enum import Enum
 
 from datetime import datetime, date
 
 from core.models.base import BaseModel
+from announcements.models import AnnouncementModel
 
 
 class UserRole(str, Enum):
@@ -34,3 +35,5 @@ class UserModel(BaseModel):
 
     is_active: Mapped[bool] = mapped_column(default=False)
     is_mailing: Mapped[bool] = mapped_column(default=True)
+
+    announcements: Mapped[list["AnnouncementModel"]] = relationship(backref="user")

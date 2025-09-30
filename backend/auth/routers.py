@@ -15,7 +15,7 @@ auth_router = APIRouter(
 @auth_router.post('/registration', response_model=UserCreatedResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit('5/minute')
 async def registration_user(user_data: UserRegistrationSchema, request: Request, auth_service: AuthService = Depends(get_auth_service)):
-    return await auth_service.registration(user_data, request)
+    return await auth_service.registration(user_data)
 
 @auth_router.post('/login', response_model=AccessTokenResponseSchema)
 @limiter.limit('10/minute')

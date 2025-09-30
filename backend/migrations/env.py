@@ -11,6 +11,7 @@ from src.settings import database_settings
 
 from core.models.base import BaseModel
 from users.models import UserModel
+from announcements.models import TagModel, FandomModel, NsfwTabooModel, NsfwFetishModel, AnnouncementModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,4 +1,6 @@
-from .models import UserModel, Response
+from fastapi import Response
+
+from .models import UserModel
 from .repositories import UsersRepository
 from .schemas import UserUpdateSchema
 
