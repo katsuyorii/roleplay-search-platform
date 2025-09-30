@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, status
 
 from .dependencies import get_users_service
 from .services import UsersService
@@ -17,3 +17,7 @@ async def get_me(users_service: UsersService = Depends(get_users_service)):
 @users_router.patch('/me', response_model=UserResponseSchema)
 async def update_me(updated_user_data: UserUpdateSchema, users_service: UsersService = Depends(get_users_service)):
     return await users_service.update_current_user(updated_user_data)
+
+@users_router.delete('/me', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_me(response: Response, users_service: UsersService = Depends(get_users_service)):
+    return await users_service.delete_current_user(response)
