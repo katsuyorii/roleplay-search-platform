@@ -26,14 +26,14 @@ annnouncements_nsfw_fetishes = Table(
     'annnouncements_nsfw_fetishes',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
-    Column('nsfw_fetish_id', ForeignKey('nsfw_fetishes.id'), primary_key=True),
+    Column('nsfw_fetish_id', ForeignKey('nsfw_fetishes_taboo.id'), primary_key=True),
 )
 
 annnouncements_nsfw_taboo = Table(
     'annnouncements_nsfw_taboo',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
-    Column('nsfw_taboo_id', ForeignKey('nsfw_taboo.id'), primary_key=True),
+    Column('nsfw_taboo_id', ForeignKey('nsfw_fetishes_taboo.id'), primary_key=True),
 )
 
 
@@ -50,14 +50,8 @@ class AnnouncementGender(str, Enum):
     ANOTHER = 'another'
 
 
-class NsfwFetishModel(BaseModel):
-    __tablename__ = 'nsfw_fetishes'
-
-    name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
-
-
-class NsfwTabooModel(BaseModel):
-    __tablename__ = 'nsfw_taboo'
+class NsfwFetishTabooModel(BaseModel):
+    __tablename__ = 'nsfw_fetishes_taboo'
 
     name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
 
@@ -92,5 +86,5 @@ class AnnouncementModel(BaseModel):
     is_verify: Mapped[bool] = mapped_column(default=False)
 
     is_nsfw: Mapped[bool] = mapped_column(default=False)
-    nsfw_fetishes: Mapped[list[NsfwFetishModel]] = relationship(secondary=annnouncements_nsfw_fetishes)
-    nsfw_taboo: Mapped[list[NsfwTabooModel]] = relationship(secondary=annnouncements_nsfw_taboo)
+    nsfw_fetishes: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=annnouncements_nsfw_fetishes)
+    nsfw_taboo: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=annnouncements_nsfw_taboo)

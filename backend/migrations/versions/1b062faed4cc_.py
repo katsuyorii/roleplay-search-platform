@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c83933f1c4b8
-Revises: a41c106153bd
-Create Date: 2025-09-30 07:22:47.839556
+Revision ID: 1b062faed4cc
+Revises: 
+Create Date: 2025-09-30 10:59:26.648606
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c83933f1c4b8'
-down_revision: Union[str, Sequence[str], None] = 'a41c106153bd'
+revision: str = '1b062faed4cc'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -29,22 +29,14 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_fandoms_name'), 'fandoms', ['name'], unique=True)
-    op.create_table('nsfw_fetishes',
+    op.create_table('nsfw_fetishes_taboo',
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_nsfw_fetishes_name'), 'nsfw_fetishes', ['name'], unique=True)
-    op.create_table('nsfw_taboo',
-    sa.Column('name', sa.String(length=256), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_nsfw_taboo_name'), 'nsfw_taboo', ['name'], unique=True)
+    op.create_index(op.f('ix_nsfw_fetishes_taboo_name'), 'nsfw_fetishes_taboo', ['name'], unique=True)
     op.create_table('tags',
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
@@ -53,6 +45,23 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_tags_name'), 'tags', ['name'], unique=True)
+    op.create_table('users',
+    sa.Column('email', sa.String(length=255), nullable=False),
+    sa.Column('username', sa.String(length=255), nullable=True),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.Column('role', sa.String(length=5), nullable=False),
+    sa.Column('gender', sa.String(length=6), nullable=True),
+    sa.Column('date_of_birth', sa.Date(), nullable=True),
+    sa.Column('last_login', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_mailing', sa.Boolean(), nullable=False),
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.create_table('announcements',
     sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('orientation', sa.String(length=8), nullable=True),
@@ -80,14 +89,14 @@ def upgrade() -> None:
     sa.Column('annnouncement_id', sa.UUID(), nullable=False),
     sa.Column('nsfw_fetish_id', sa.UUID(), nullable=False),
     sa.ForeignKeyConstraint(['annnouncement_id'], ['announcements.id'], ),
-    sa.ForeignKeyConstraint(['nsfw_fetish_id'], ['nsfw_fetishes.id'], ),
+    sa.ForeignKeyConstraint(['nsfw_fetish_id'], ['nsfw_fetishes_taboo.id'], ),
     sa.PrimaryKeyConstraint('annnouncement_id', 'nsfw_fetish_id')
     )
     op.create_table('annnouncements_nsfw_taboo',
     sa.Column('annnouncement_id', sa.UUID(), nullable=False),
     sa.Column('nsfw_taboo_id', sa.UUID(), nullable=False),
     sa.ForeignKeyConstraint(['annnouncement_id'], ['announcements.id'], ),
-    sa.ForeignKeyConstraint(['nsfw_taboo_id'], ['nsfw_taboo.id'], ),
+    sa.ForeignKeyConstraint(['nsfw_taboo_id'], ['nsfw_fetishes_taboo.id'], ),
     sa.PrimaryKeyConstraint('annnouncement_id', 'nsfw_taboo_id')
     )
     op.create_table('annnouncements_tags',
@@ -108,12 +117,13 @@ def downgrade() -> None:
     op.drop_table('annnouncements_nsfw_fetishes')
     op.drop_table('annnouncements_fandoms')
     op.drop_table('announcements')
+    op.drop_index(op.f('ix_users_username'), table_name='users')
+    op.drop_index(op.f('ix_users_email'), table_name='users')
+    op.drop_table('users')
     op.drop_index(op.f('ix_tags_name'), table_name='tags')
     op.drop_table('tags')
-    op.drop_index(op.f('ix_nsfw_taboo_name'), table_name='nsfw_taboo')
-    op.drop_table('nsfw_taboo')
-    op.drop_index(op.f('ix_nsfw_fetishes_name'), table_name='nsfw_fetishes')
-    op.drop_table('nsfw_fetishes')
+    op.drop_index(op.f('ix_nsfw_fetishes_taboo_name'), table_name='nsfw_fetishes_taboo')
+    op.drop_table('nsfw_fetishes_taboo')
     op.drop_index(op.f('ix_fandoms_name'), table_name='fandoms')
     op.drop_table('fandoms')
     # ### end Alembic commands ###
