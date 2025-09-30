@@ -6,6 +6,7 @@ from slowapi.errors import RateLimitExceeded
 from src.limiter import limiter
 from auth.routers import auth_router
 from users.routers import users_router
+from announcements.routers import announcements_router
 
 
 app = FastAPI()
@@ -15,3 +16,4 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(announcements_router)
