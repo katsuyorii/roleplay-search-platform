@@ -1,8 +1,11 @@
+import uuid
+
 from users.models import UserModel
 
 from .models import AnnouncementModel
 from .repositories import AnnouncementsRepository
 from .schemas import AnnouncementCreateSchema
+from .exceptions import AnnouncementNotFound
 
 
 class AnnouncementsService:
@@ -14,6 +17,14 @@ class AnnouncementsService:
         announcements = await self.announcements_repository.get_all()
 
         return announcements
+    
+    async def get(self, announcement_id: uuid.UUID) -> AnnouncementModel | None:
+        announcement = await self.announcements_repository.get(announcement_id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+
+        return announcement
     
     async def create(self, announcement_data: AnnouncementCreateSchema) -> AnnouncementModel:
         announcement_data_dict = announcement_data.model_dump(exclude_unset=True)

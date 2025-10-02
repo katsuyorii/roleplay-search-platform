@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +19,7 @@ class DatabaseBaseRepository:
 
         return result.scalars().all()
     
-    async def get(self, id: int) -> T | None:
+    async def get(self, id: uuid.UUID) -> T | None:
         result = await self.session.execute(select(self.model).where(self.model.id == id))
 
         return result.scalar_one_or_none()
