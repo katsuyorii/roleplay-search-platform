@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, Response, status
 
-from announcements.schemas import AnnouncementResponseSchema, AnnouncementCreateSchema
+from announcements.schemas import AnnouncementResponseSchema, AnnouncementCreateSchema, AnnouncementUpdateSchema
 
 from .dependencies import get_users_service
 from .services import UsersService
@@ -33,6 +33,10 @@ async def get_announcements_me(users_service: UsersService = Depends(get_users_s
 @users_router.post('/me/announcements', response_model=AnnouncementResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_announcement_me(announcement_data: AnnouncementCreateSchema, users_service: UsersService = Depends(get_users_service)):
     return await users_service.create_announcements_user(announcement_data)
+
+@users_router.patch('/me/announcements/{announcement_id}', response_model=AnnouncementResponseSchema)
+async def update_announcement_me(announcement_id: uuid.UUID, updated_announcement_data: AnnouncementUpdateSchema, users_service: UsersService = Depends(get_users_service)):
+    return await users_service.update_announcement_user(announcement_id, updated_announcement_data)
 
 @users_router.delete('/me/announcements/{announcement_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_announcement_me(announcement_id: uuid.UUID, users_service: UsersService = Depends(get_users_service)):

@@ -52,3 +52,17 @@ class AnnouncementCreateSchema(BaseModel):
     is_nsfw: bool = Field(default=False)
     nsfw_fetishes: list[uuid.UUID] | None = Field(default=None)
     nsfw_taboo: list[uuid.UUID] | None = Field(default=None)
+
+
+class AnnouncementUpdateSchema(BaseModel):
+    orientation: str | None = Field(default=None)
+    gender: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    fandoms: list[uuid.UUID] | None = Field(default=None)
+    tags: list[uuid.UUID] | None = Field(default=None)
+    is_crossgender: bool | None = Field(default=None)
+    is_active: bool | None = Field(default=None)
+    is_anonymously: bool | None = Field(default=None)
+    is_nsfw: bool | None = Field(default=None)
+    nsfw_fetishes: list[uuid.UUID] | None = Field(default=None)
+    nsfw_taboo: list[uuid.UUID] | None = Field(default=None)

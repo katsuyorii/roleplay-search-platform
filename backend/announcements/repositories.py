@@ -37,7 +37,7 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
     
     async def get_all(self, skip: int = 0, limit: int = 10) -> list[AnnouncementModel]:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).offset(skip).limit(limit))
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify is True).offset(skip).limit(limit))
 
         return result.scalars().all()
     
@@ -71,6 +71,28 @@ class AnnouncementsRepository(DatabaseBaseRepository):
             obj.nsfw_taboo = selected_nsfw_taboo
 
         self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj, ['fandoms', 'tags', 'nsfw_fetishes', 'nsfw_taboo'])
+
+        return obj
+    
+    async def update(self, obj: AnnouncementModel, updated_obj_dict: dict) -> AnnouncementModel:
+        for key, value in updated_obj_dict.items():
+            if key == 'fandoms':
+                selected_fandoms = await self.fandoms_repository.get_by_ids(updated_obj_dict.get('fandoms'))
+                value = selected_fandoms
+            if key == 'tags':
+                selected_tags = await self.tags_repository.get_by_ids(updated_obj_dict.get('tags'))
+                value = selected_tags
+            if key == 'nsfw_fetishes':
+                selected_nsfw_fetishes = await self.nsfw_fetishes_taboo_repository.get_by_ids(updated_obj_dict.get('nsfw_fetishes'))
+                value = selected_nsfw_fetishes
+            if key == 'nsfw_taboo':
+                selected_nsfw_taboo = await self.nsfw_fetishes_taboo_repository.get_by_ids(updated_obj_dict.get('nsfw_taboo'))
+                value = selected_nsfw_taboo
+
+            setattr(obj, key, value)
+
         await self.session.commit()
         await self.session.refresh(obj, ['fandoms', 'tags', 'nsfw_fetishes', 'nsfw_taboo'])
 
