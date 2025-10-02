@@ -38,6 +38,14 @@ class UsersService:
 
         return announcements
     
+    async def get_one_announcements_user(self, announcement_id: uuid.UUID) -> AnnouncementModel:
+        announcement = await self.announcements_repository.get_by_user_id_and_id(announcement_id, self.current_user.id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+
+        return announcement
+    
     async def create_announcements_user(self, announcement_data: AnnouncementCreateSchema) -> AnnouncementModel:
         announcement_data_dict = announcement_data.model_dump(exclude_unset=True)
         announcement_data_dict['user_id'] = self.current_user.id

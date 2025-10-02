@@ -30,6 +30,10 @@ async def delete_me(response: Response, users_service: UsersService = Depends(ge
 async def get_announcements_me(users_service: UsersService = Depends(get_users_service)):
     return await users_service.get_announcements_user()
 
+@users_router.get('/me/announcements/{announcement_id}', response_model=AnnouncementResponseSchema)
+async def get_announcement_me(announcement_id: uuid.UUID, users_service: UsersService = Depends(get_users_service)):
+    return await users_service.get_one_announcements_user(announcement_id)
+
 @users_router.post('/me/announcements', response_model=AnnouncementResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_announcement_me(announcement_data: AnnouncementCreateSchema, users_service: UsersService = Depends(get_users_service)):
     return await users_service.create_announcements_user(announcement_data)

@@ -50,6 +50,11 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.user_id == user_id))
 
         return result.scalars().all()
+    
+    async def get_by_user_id_and_id(self, id: uuid.UUID, user_id: uuid.UUID) -> AnnouncementModel | None:
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id, self.model.user_id == user_id))
+
+        return result.scalar_one_or_none()
 
     async def create(self, obj_dict: dict) -> AnnouncementModel:
         obj = self.model(**obj_dict)
