@@ -1,8 +1,11 @@
+import uuid
+
 from fastapi import Response
 
 from announcements.models import AnnouncementModel
 from announcements.repositories import AnnouncementsRepository
 from announcements.schemas import AnnouncementCreateSchema
+from announcements.exceptions import AnnouncementNotFound
 
 from .models import UserModel
 from .repositories import UsersRepository
@@ -42,3 +45,11 @@ class UsersService:
         new_announcement = await self.announcements_repository.create(announcement_data_dict)
 
         return new_announcement
+    
+    async def delete_announcements_user(self, announcement_id: uuid.UUID) -> None:
+        announcement = await self.announcements_repository.get(announcement_id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+        
+        await self.announcements_repository.delete(announcement)
