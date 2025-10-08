@@ -6,6 +6,7 @@ from announcements.models import AnnouncementModel
 from announcements.repositories import AnnouncementsRepository
 from announcements.schemas import AnnouncementCreateSchema, AnnouncementUpdateSchema
 from announcements.exceptions import AnnouncementNotFound
+from announcements.filters import AnnouncementFilter
 
 from .models import UserModel
 from .repositories import UsersRepository
@@ -33,7 +34,7 @@ class UsersService:
 
         response.delete_cookie('refresh_token')
     
-    async def get_announcements_user(self) -> list[AnnouncementModel]:
+    async def get_announcements_user(self, announcements_filter: AnnouncementFilter, skip: int | None = None, limit: int | None = None) -> list[AnnouncementModel]:
         announcements = await self.announcements_repository.get_by_user_id(self.current_user.id)
 
         return announcements

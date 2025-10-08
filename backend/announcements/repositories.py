@@ -37,12 +37,14 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         self.tags_repository = tags_repository
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
     
-    async def get_all(self, announcements_filter: AnnouncementFilter) -> list[AnnouncementModel]:
+    async def get_all(self, announcements_filter: AnnouncementFilter, skip: int = 0, limit: int = 5) -> list[AnnouncementModel]:
         query = select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify == True, self.model.is_active == True)
     
         filtered_query = announcements_filter.filter(query)
+
+        paginated_query = filtered_query.offset(skip).limit(limit)
         
-        result = await self.session.execute(filtered_query)
+        result = await self.session.execute(paginated_query)
         
         return result.scalars().all()
     
@@ -51,8 +53,14 @@ class AnnouncementsRepository(DatabaseBaseRepository):
 
         return result.scalar_one_or_none()
     
-    async def get_by_user_id(self, user_id: uuid.UUID) -> list[AnnouncementModel]:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.user_id == user_id))
+    async def get_by_user_id(self, user_id: uuid.UUID, announcements_filter: AnnouncementFilter, skip: int = 0, limit: int = 5) -> list[AnnouncementModel]:
+        query = select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.user_id == user_id)
+
+        filtered_query = announcements_filter.filter(query)
+
+        paginated_query = filtered_query.offset(skip).limit(limit)
+
+        result = await self.session.execute(paginated_query)
 
         return result.scalars().all()
     
