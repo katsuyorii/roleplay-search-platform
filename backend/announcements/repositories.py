@@ -37,12 +37,12 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
     
     async def get_all(self, skip: int = 0, limit: int = 10) -> list[AnnouncementModel]:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify is True).offset(skip).limit(limit))
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify is True, self.model.is_active is True).offset(skip).limit(limit))
 
         return result.scalars().all()
     
     async def get(self, id: uuid.UUID) -> AnnouncementModel | None:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id))
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id, self.model.is_verify is True, self.model.is_active is True))
 
         return result.scalar_one_or_none()
     
@@ -55,7 +55,7 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id, self.model.user_id == user_id))
 
         return result.scalar_one_or_none()
-
+    
     async def create(self, obj_dict: dict) -> AnnouncementModel:
         obj = self.model(**obj_dict)
 
@@ -102,4 +102,3 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         await self.session.refresh(obj, ['fandoms', 'tags', 'nsfw_fetishes', 'nsfw_taboo'])
 
         return obj
-    

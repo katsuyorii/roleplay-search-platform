@@ -13,10 +13,7 @@ class UserLoginSchema(BaseModel):
     password: str
 
 
-class UserRegistrationSchema(BaseModel):
-    email: EmailStr = Field(max_length=255)
-    password: str
-
+class UserRegistrationSchema(UserLoginSchema):
     @field_validator('password')
     @classmethod
     def validate_password(cls, value):

@@ -38,7 +38,7 @@ class UsersService:
 
         return announcements
     
-    async def get_one_announcements_user(self, announcement_id: uuid.UUID) -> AnnouncementModel:
+    async def get_announcement_user(self, announcement_id: uuid.UUID) -> AnnouncementModel:
         announcement = await self.announcements_repository.get_by_user_id_and_id(announcement_id, self.current_user.id)
 
         if announcement is None:
@@ -46,7 +46,7 @@ class UsersService:
 
         return announcement
     
-    async def create_announcements_user(self, announcement_data: AnnouncementCreateSchema) -> AnnouncementModel:
+    async def create_announcement_user(self, announcement_data: AnnouncementCreateSchema) -> AnnouncementModel:
         announcement_data_dict = announcement_data.model_dump(exclude_unset=True)
         announcement_data_dict['user_id'] = self.current_user.id
 
@@ -56,15 +56,15 @@ class UsersService:
     
     async def update_announcement_user(self, announcement_id: uuid.UUID, updated_announcement_data: AnnouncementUpdateSchema) -> AnnouncementModel:
         updated_announcement_data_dict = updated_announcement_data.model_dump(exclude_unset=True)
-        announcement = await self.announcements_repository.get(announcement_id)
+        announcement = await self.announcements_repository.get_by_user_id_and_id(announcement_id, self.current_user.id)
 
         if announcement is None:
             raise AnnouncementNotFound()
         
         return await self.announcements_repository.update(announcement, updated_announcement_data_dict)
     
-    async def delete_announcements_user(self, announcement_id: uuid.UUID) -> None:
-        announcement = await self.announcements_repository.get(announcement_id)
+    async def delete_announcement_user(self, announcement_id: uuid.UUID) -> None:
+        announcement = await self.announcements_repository.get_by_user_id_and_id(announcement_id, self.current_user.id)
 
         if announcement is None:
             raise AnnouncementNotFound()

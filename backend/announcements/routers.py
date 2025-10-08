@@ -13,7 +13,7 @@ announcements_router = APIRouter(
 )
 
 @announcements_router.get('', response_model=list[AnnouncementResponseSchema])
-async def get_all_announcements(announcements_service: AnnouncementsService = Depends(get_announcements_service)):
+async def get_announcements(announcements_service: AnnouncementsService = Depends(get_announcements_service)):
     return await announcements_service.get_all()
 
 @announcements_router.get('/{announcement_id}', response_model=AnnouncementResponseSchema)

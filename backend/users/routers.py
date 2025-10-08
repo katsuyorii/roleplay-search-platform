@@ -32,11 +32,11 @@ async def get_announcements_me(users_service: UsersService = Depends(get_users_s
 
 @users_router.get('/me/announcements/{announcement_id}', response_model=AnnouncementResponseSchema)
 async def get_announcement_me(announcement_id: uuid.UUID, users_service: UsersService = Depends(get_users_service)):
-    return await users_service.get_one_announcements_user(announcement_id)
+    return await users_service.get_announcement_user(announcement_id)
 
 @users_router.post('/me/announcements', response_model=AnnouncementResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_announcement_me(announcement_data: AnnouncementCreateSchema, users_service: UsersService = Depends(get_users_service)):
-    return await users_service.create_announcements_user(announcement_data)
+    return await users_service.create_announcement_user(announcement_data)
 
 @users_router.patch('/me/announcements/{announcement_id}', response_model=AnnouncementResponseSchema)
 async def update_announcement_me(announcement_id: uuid.UUID, updated_announcement_data: AnnouncementUpdateSchema, users_service: UsersService = Depends(get_users_service)):
@@ -44,4 +44,4 @@ async def update_announcement_me(announcement_id: uuid.UUID, updated_announcemen
 
 @users_router.delete('/me/announcements/{announcement_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_announcement_me(announcement_id: uuid.UUID, users_service: UsersService = Depends(get_users_service)):
-    return await users_service.delete_announcements_user(announcement_id)
+    return await users_service.delete_announcement_user(announcement_id)

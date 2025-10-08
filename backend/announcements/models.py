@@ -8,29 +8,29 @@ from enum import Enum
 from core.models.base import BaseModel
 
 
-annnouncements_fandoms = Table(
-    'annnouncements_fandoms',
+announcements_fandoms = Table(
+    'announcements_fandoms',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
     Column('fandom_id', ForeignKey('fandoms.id'), primary_key=True),
 )
 
-annnouncements_tags = Table(
-    'annnouncements_tags',
+announcements_tags = Table(
+    'announcements_tags',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
     Column('tag_id', ForeignKey('tags.id'), primary_key=True),
 )
 
-annnouncements_nsfw_fetishes = Table(
-    'annnouncements_nsfw_fetishes',
+announcements_nsfw_fetishes = Table(
+    'announcements_nsfw_fetishes',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
     Column('nsfw_fetish_id', ForeignKey('nsfw_fetishes_taboo.id'), primary_key=True),
 )
 
-annnouncements_nsfw_taboo = Table(
-    'annnouncements_nsfw_taboo',
+announcements_nsfw_taboo = Table(
+    'announcements_nsfw_taboo',
     BaseModel.metadata,
     Column('annnouncement_id', ForeignKey('announcements.id'), primary_key=True),
     Column('nsfw_taboo_id', ForeignKey('nsfw_fetishes_taboo.id'), primary_key=True),
@@ -77,8 +77,8 @@ class AnnouncementModel(BaseModel):
     description: Mapped[str]
     # posters_urls: List[] (M2M)
 
-    fandoms: Mapped[list[FandomModel]] = relationship(secondary=annnouncements_fandoms)
-    tags: Mapped[list[TagModel]] = relationship(secondary=annnouncements_tags)
+    fandoms: Mapped[list[FandomModel]] = relationship(secondary=announcements_fandoms)
+    tags: Mapped[list[TagModel]] = relationship(secondary=announcements_tags)
 
     is_crossgender: Mapped[bool] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True)
@@ -86,5 +86,5 @@ class AnnouncementModel(BaseModel):
     is_verify: Mapped[bool] = mapped_column(default=False)
 
     is_nsfw: Mapped[bool] = mapped_column(default=False)
-    nsfw_fetishes: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=annnouncements_nsfw_fetishes)
-    nsfw_taboo: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=annnouncements_nsfw_taboo)
+    nsfw_fetishes: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=announcements_nsfw_fetishes)
+    nsfw_taboo: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=announcements_nsfw_taboo)
