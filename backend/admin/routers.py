@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 
 from .dependencies import get_admin_service
 from .services import AdminService
-from .schemas import FandomResponseSchema, FandomCreateSchema, TagResponseSchema, TagCreateSchema
+from .schemas import FandomResponseSchema, FandomCreateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
 
 
 admin_router = APIRouter(
@@ -25,3 +25,11 @@ async def get_tags(admin_service: AdminService = Depends(get_admin_service), ski
 @admin_router.post('/tags', response_model=TagResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_tag(tag_data: TagCreateSchema, admin_service: AdminService = Depends(get_admin_service)):
     return await admin_service.create_tag_admin(tag_data)
+
+@admin_router.get('/nsfw', response_model=list[NsfwFetishesTabooResponseSchema])
+async def get_fetishes_taboo(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):
+    return await admin_service.get_nsfw_fetishes_taboo_admin(skip, limit)
+
+@admin_router.post('/nsfw', response_model=NsfwFetishesTabooResponseSchema, status_code=status.HTTP_201_CREATED)
+async def create_fetish_taboo(nsfw_fetish_taboo_data: NsfwFetishesTabooCreateSchema, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.create_nsfw_fetishes_taboo_admin(nsfw_fetish_taboo_data)

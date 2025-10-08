@@ -1,9 +1,9 @@
 from slugify import slugify
 
-from announcements.models import FandomModel, TagModel
+from announcements.models import FandomModel, TagModel, NsfwFetishTabooModel
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
-from .schemas import FandomCreateSchema, TagCreateSchema
+from .schemas import FandomCreateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema
 
 
 class AdminService:
@@ -37,3 +37,16 @@ class AdminService:
         new_tag = await self.tags_repository.create(tag_data_dict)
 
         return new_tag
+
+    async def get_nsfw_fetishes_taboo_admin(self, skip: int | None = None, limit: int | None = None) -> list[NsfwFetishTabooModel]:
+        tags = await self.nsfw_fetishes_taboo_repository.get_all(skip, limit)
+
+        return tags
+    
+    async def create_nsfw_fetishes_taboo_admin(self, nsfw_fetish_taboo_data: NsfwFetishesTabooCreateSchema) -> NsfwFetishTabooModel:
+        nsfw_fetish_taboo_data_dict = nsfw_fetish_taboo_data.model_dump(exclude_unset=True)
+        nsfw_fetish_taboo_data_dict['slug'] = slugify(nsfw_fetish_taboo_data.name)
+
+        new_nsfw_fetish_taboo = await self.nsfw_fetishes_taboo_repository.create(nsfw_fetish_taboo_data_dict)
+
+        return new_nsfw_fetish_taboo
