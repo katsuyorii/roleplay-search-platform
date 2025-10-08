@@ -53,19 +53,22 @@ class AnnouncementGender(str, Enum):
 class NsfwFetishTabooModel(BaseModel):
     __tablename__ = 'nsfw_fetishes_taboo'
 
-    name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(256), unique=True)
+    slug: Mapped[str] = mapped_column(String(256), unique=True, index=True)
 
 
 class FandomModel(BaseModel):
     __tablename__ = 'fandoms'
 
-    name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(256), unique=True)
+    slug: Mapped[str] = mapped_column(String(256), unique=True, index=True)
 
 
 class TagModel(BaseModel):
     __tablename__ = 'tags'
 
-    name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(256), unique=True)
+    slug: Mapped[str] = mapped_column(String(256), unique=True, index=True)
 
 
 class AnnouncementModel(BaseModel):

@@ -8,21 +8,25 @@ from .models import AnnouncementOrientation, AnnouncementGender
 class FandomSchema(BaseModel):
     id: uuid.UUID
     name: str
+    slug: str
 
 
 class TagSchema(BaseModel):
     id: uuid.UUID
     name: str
+    slug: str
 
 
 class NsfwFetishSchema(BaseModel):
     id: uuid.UUID
     name: str
+    slug: str
 
 
 class NsfwTabooSchema(BaseModel):
     id: uuid.UUID
     name: str
+    slug: str
 
 
 class AnnouncementResponseSchema(BaseModel):
