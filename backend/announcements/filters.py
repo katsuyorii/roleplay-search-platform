@@ -1,6 +1,6 @@
 from fastapi_filter.contrib.sqlalchemy import Filter
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 from .models import AnnouncementModel, AnnouncementOrientation, AnnouncementGender
 
@@ -18,5 +18,6 @@ class AnnouncementFilter(Filter):
     class Constants(Filter.Constants):
         model = AnnouncementModel
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )

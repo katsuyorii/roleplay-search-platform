@@ -2,6 +2,8 @@ import uuid
 
 from pydantic import BaseModel, Field
 
+from .models import AnnouncementOrientation, AnnouncementGender
+
 
 class FandomSchema(BaseModel):
     id: uuid.UUID
@@ -26,8 +28,8 @@ class NsfwTabooSchema(BaseModel):
 class AnnouncementResponseSchema(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
-    orientation: str | None = Field(default=None)
-    gender: str | None = Field(default=None)
+    orientation: AnnouncementOrientation | None = Field(default=None)
+    gender: AnnouncementGender | None = Field(default=None)
     description: str
     fandoms: list[FandomSchema] | None = Field(default=None)
     tags: list[TagSchema] | None = Field(default=None)
@@ -41,8 +43,8 @@ class AnnouncementResponseSchema(BaseModel):
 
 
 class AnnouncementCreateSchema(BaseModel):
-    orientation: str | None = Field(default=None)
-    gender: str | None = Field(default=None)
+    orientation: AnnouncementOrientation | None = Field(default=None)
+    gender: AnnouncementGender | None = Field(default=None)
     description: str
     fandoms: list[uuid.UUID] | None = Field(default=None)
     tags: list[uuid.UUID] | None = Field(default=None)
