@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.repositories.database_base import DatabaseBaseRepository
 
 from .models import AnnouncementModel, FandomModel, TagModel, NsfwFetishTabooModel
+from .filters import AnnouncementFilter
 
 
 class FandomsRepository(DatabaseBaseRepository):
@@ -36,13 +37,17 @@ class AnnouncementsRepository(DatabaseBaseRepository):
         self.tags_repository = tags_repository
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
     
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[AnnouncementModel]:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify is True, self.model.is_active is True).offset(skip).limit(limit))
-
+    async def get_all(self, announcements_filter: AnnouncementFilter) -> list[AnnouncementModel]:
+        query = select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.is_verify == True, self.model.is_active == True)
+    
+        filtered_query = announcements_filter.filter(query)
+        
+        result = await self.session.execute(filtered_query)
+        
         return result.scalars().all()
     
     async def get(self, id: uuid.UUID) -> AnnouncementModel | None:
-        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id, self.model.is_verify is True, self.model.is_active is True))
+        result = await self.session.execute(select(self.model).options(selectinload(self.model.fandoms), selectinload(self.model.tags), selectinload(self.model.nsfw_fetishes), selectinload(self.model.nsfw_taboo)).where(self.model.id == id, self.model.is_verify == True, self.model.is_active == True))
 
         return result.scalar_one_or_none()
     
