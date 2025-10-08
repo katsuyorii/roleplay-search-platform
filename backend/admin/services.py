@@ -1,9 +1,9 @@
 from slugify import slugify
 
-from announcements.models import FandomModel
+from announcements.models import FandomModel, TagModel
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
-from .schemas import FandomCreateSchema
+from .schemas import FandomCreateSchema, TagCreateSchema
 
 
 class AdminService:
@@ -24,3 +24,16 @@ class AdminService:
         new_fandom = await self.fandoms_repository.create(fandom_data_dict)
 
         return new_fandom
+    
+    async def get_tags_admin(self, skip: int | None = None, limit: int | None = None) -> list[TagModel]:
+        tags = await self.tags_repository.get_all(skip, limit)
+
+        return tags
+    
+    async def create_tag_admin(self, tag_data: TagCreateSchema) -> TagModel:
+        tag_data_dict = tag_data.model_dump(exclude_unset=True)
+        tag_data_dict['slug'] = slugify(tag_data.name)
+
+        new_tag = await self.tags_repository.create(tag_data_dict)
+
+        return new_tag
