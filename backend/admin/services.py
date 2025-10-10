@@ -1,3 +1,5 @@
+import uuid
+
 from slugify import slugify
 
 from users.models import UserModel
@@ -6,6 +8,7 @@ from announcements.models import FandomModel, TagModel, NsfwFetishTabooModel
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
 from .schemas import FandomCreateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema
+from .exceptions import FandomNotFound
 
 
 class AdminService:
@@ -32,6 +35,14 @@ class AdminService:
         new_fandom = await self.fandoms_repository.create(fandom_data_dict)
 
         return new_fandom
+    
+    async def delete_fandom_admin(self, fandom_id: uuid.UUID) -> None:
+        fandom = await self.fandoms_repository.get(fandom_id)
+
+        if fandom is None:
+            raise FandomNotFound()
+
+        await self.fandoms_repository.delete(fandom)
     
     async def get_tags_admin(self, skip: int | None = None, limit: int | None = None) -> list[TagModel]:
         tags = await self.tags_repository.get_all(skip, limit)

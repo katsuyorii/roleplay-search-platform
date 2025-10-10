@@ -29,7 +29,7 @@ class UsersService:
         return self.current_user
     
     async def delete_current_user(self, response: Response) -> None:
-        self.users_repository.delete(self.current_user)
+        await self.users_repository.delete(self.current_user)
 
         response.delete_cookie('refresh_token')
     

@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, status
 
 from users.schemas import UserResponseSchema
@@ -23,6 +25,10 @@ async def get_fandoms(admin_service: AdminService = Depends(get_admin_service), 
 @admin_router.post('/fandoms', response_model=FandomResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_fandom(fandom_data: FandomCreateSchema, admin_service: AdminService = Depends(get_admin_service)):
     return await admin_service.create_fandom_admin(fandom_data)
+
+@admin_router.delete('/fandoms/{fandom_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_fandom(fandom_id: uuid.UUID, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.delete_fandom_admin(fandom_id)
 
 @admin_router.get('/tags', response_model=list[TagResponseSchema])
 async def get_tags(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):
