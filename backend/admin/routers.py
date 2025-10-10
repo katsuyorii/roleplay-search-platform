@@ -6,7 +6,7 @@ from users.schemas import UserResponseSchema
 
 from .dependencies import get_admin_service
 from .services import AdminService
-from .schemas import FandomResponseSchema, FandomCreateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
+from .schemas import FandomResponseSchema, FandomCreateSchema, FandomUpdateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
 
 
 admin_router = APIRouter(
@@ -25,6 +25,10 @@ async def get_fandoms(admin_service: AdminService = Depends(get_admin_service), 
 @admin_router.post('/fandoms', response_model=FandomResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_fandom(fandom_data: FandomCreateSchema, admin_service: AdminService = Depends(get_admin_service)):
     return await admin_service.create_fandom_admin(fandom_data)
+
+@admin_router.patch('/fandoms/{fandom_id}', response_model=FandomResponseSchema)
+async def update_fandom(fandom_id: uuid.UUID, updated_fandom_data: FandomUpdateSchema, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.update_fandom_admin(fandom_id, updated_fandom_data)
 
 @admin_router.delete('/fandoms/{fandom_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_fandom(fandom_id: uuid.UUID, admin_service: AdminService = Depends(get_admin_service)):

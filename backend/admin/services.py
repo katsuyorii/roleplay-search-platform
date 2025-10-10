@@ -7,7 +7,7 @@ from users.repositories import UsersRepository
 from announcements.models import FandomModel, TagModel, NsfwFetishTabooModel
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
-from .schemas import FandomCreateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema
+from .schemas import FandomCreateSchema, FandomUpdateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema
 from .exceptions import FandomNotFound
 
 
@@ -35,6 +35,17 @@ class AdminService:
         new_fandom = await self.fandoms_repository.create(fandom_data_dict)
 
         return new_fandom
+    
+    async def update_fandom_admin(self, fandom_id: uuid.UUID, updated_fandom_data: FandomUpdateSchema) -> FandomModel:
+        updated_fandom_data_dict = updated_fandom_data.model_dump(exclude_unset=True)
+        updated_fandom_data_dict['slug'] = slugify(updated_fandom_data.name)
+
+        fandom = await self.fandoms_repository.get(fandom_id)
+
+        if fandom is None:
+            raise FandomNotFound()
+        
+        return await self.fandoms_repository.update(fandom, updated_fandom_data_dict)
     
     async def delete_fandom_admin(self, fandom_id: uuid.UUID) -> None:
         fandom = await self.fandoms_repository.get(fandom_id)

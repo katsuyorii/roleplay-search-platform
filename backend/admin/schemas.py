@@ -13,6 +13,10 @@ class FandomCreateSchema(BaseModel):
     name: str = Field(max_length=256)
 
 
+class FandomUpdateSchema(BaseModel):
+    name: str | None = Field(default=None, max_length=256)
+
+
 class TagResponseSchema(FandomResponseSchema):
     pass
 
