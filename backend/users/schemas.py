@@ -12,7 +12,7 @@ class UserResponseSchema(BaseModel):
     role: str
     gender: str | None
     date_of_birth: date | None
-    last_login: datetime
+    last_login: datetime | None
     is_active: bool
     is_mailing: bool
     created_at: datetime

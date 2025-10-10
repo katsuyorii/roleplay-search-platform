@@ -1,5 +1,7 @@
 from slugify import slugify
 
+from users.models import UserModel
+from users.repositories import UsersRepository
 from announcements.models import FandomModel, TagModel, NsfwFetishTabooModel
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
@@ -7,10 +9,16 @@ from .schemas import FandomCreateSchema, TagCreateSchema, NsfwFetishesTabooCreat
 
 
 class AdminService:
-    def __init__(self, fandoms_repository: FandomsRepository, tags_repository: TagsRepository, nsfw_fetishes_taboo_repository: NsfwFetishTabooRepository):
+    def __init__(self, fandoms_repository: FandomsRepository, tags_repository: TagsRepository, nsfw_fetishes_taboo_repository: NsfwFetishTabooRepository, users_repository: UsersRepository):
+        self.users_repository = users_repository
         self.fandoms_repository = fandoms_repository
         self.tags_repository = tags_repository
         self.nsfw_fetishes_taboo_repository = nsfw_fetishes_taboo_repository
+    
+    async def get_users_admin(self, skip: int | None = None, limit: int | None = None) -> list[UserModel]:
+        users = await self.users_repository.get_all(skip, limit)
+
+        return users
     
     async def get_fandoms_admin(self, skip: int | None = None, limit: int | None = None) -> list[FandomModel]:
         fandoms = await self.fandoms_repository.get_all(skip, limit)

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
 
+from users.schemas import UserResponseSchema
+
 from .dependencies import get_admin_service
 from .services import AdminService
 from .schemas import FandomResponseSchema, FandomCreateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
@@ -9,6 +11,10 @@ admin_router = APIRouter(
     prefix='/admin',
     tags=['Admin'],
 )
+
+@admin_router.get('/users', response_model=list[UserResponseSchema])
+async def get_users(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):
+    return await admin_service.get_users_admin(skip, limit)
 
 @admin_router.get('/fandoms', response_model=list[FandomResponseSchema])
 async def get_fandoms(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):
