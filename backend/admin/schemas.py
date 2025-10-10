@@ -2,6 +2,13 @@ import uuid
 
 from pydantic import BaseModel, Field
 
+from announcements.schemas import AnnouncementResponseSchema
+
+
+class AnnouncementAdminResponseSchema(AnnouncementResponseSchema):
+    is_verify: bool
+    moderator_message: str | None = Field(default=None)
+
 
 class FandomResponseSchema(BaseModel):
     id: uuid.UUID

@@ -40,7 +40,6 @@ class AnnouncementResponseSchema(BaseModel):
     is_crossgender: bool 
     is_active: bool
     is_anonymously: bool
-    is_verify: bool
     is_nsfw: bool
     nsfw_fetishes: list[NsfwFetishSchema] | None = Field(default=None)
     nsfw_taboo: list[NsfwTabooSchema] | None = Field(default=None)
