@@ -5,11 +5,11 @@ from fastapi import APIRouter, Depends, Response, status
 from fastapi_filter import FilterDepends
 
 from announcements.filters import AnnouncementFilter
-from announcements.schemas import AnnouncementResponseSchema, AnnouncementCreateSchema, AnnouncementUpdateSchema
+from announcements.schemas import AnnouncementResponseSchema
 
 from .dependencies import get_users_service
 from .services import UsersService
-from .schemas import UserResponseSchema, UserUpdateSchema
+from .schemas import UserResponseSchema, UserUpdateSchema, AnnouncementCreateSchema, AnnouncementUpdateSchema
 
 
 users_router = APIRouter(

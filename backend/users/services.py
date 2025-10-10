@@ -4,13 +4,12 @@ from fastapi import Response
 
 from announcements.models import AnnouncementModel
 from announcements.repositories import AnnouncementsRepository
-from announcements.schemas import AnnouncementCreateSchema, AnnouncementUpdateSchema
 from announcements.exceptions import AnnouncementNotFound
 from announcements.filters import AnnouncementFilter
 
 from .models import UserModel
 from .repositories import UsersRepository
-from .schemas import UserUpdateSchema
+from .schemas import UserUpdateSchema, AnnouncementCreateSchema, AnnouncementUpdateSchema
 
 
 class UsersService:
