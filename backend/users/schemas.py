@@ -17,6 +17,7 @@ class UserResponseSchema(BaseModel):
     last_login: datetime | None
     is_active: bool
     is_mailing: bool
+    moderator_message: str | None
     created_at: datetime
     updated_at: datetime
 

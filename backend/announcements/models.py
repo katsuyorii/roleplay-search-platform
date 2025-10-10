@@ -91,3 +91,5 @@ class AnnouncementModel(BaseModel):
     is_nsfw: Mapped[bool] = mapped_column(default=False)
     nsfw_fetishes: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=announcements_nsfw_fetishes)
     nsfw_taboo: Mapped[list[NsfwFetishTabooModel]] = relationship(secondary=announcements_nsfw_taboo)
+
+    moderator_message: Mapped[str] = mapped_column(nullable=True)
