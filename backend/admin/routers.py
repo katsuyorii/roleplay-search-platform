@@ -22,6 +22,10 @@ async def get_users(admin_service: AdminService = Depends(get_admin_service), sk
 async def get_fandoms(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):
     return await admin_service.get_fandoms_admin(skip, limit)
 
+@admin_router.get('/fandoms/{fandom_id}', response_model=FandomResponseSchema)
+async def get_fandom(fandom_id: uuid.UUID, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.get_fandom_admin(fandom_id)
+
 @admin_router.post('/fandoms', response_model=FandomResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_fandom(fandom_data: FandomCreateSchema, admin_service: AdminService = Depends(get_admin_service)):
     return await admin_service.create_fandom_admin(fandom_data)

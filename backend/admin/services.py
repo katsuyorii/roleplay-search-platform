@@ -28,6 +28,14 @@ class AdminService:
 
         return fandoms
     
+    async def get_fandom_admin(self, fandom_id: uuid.UUID) -> FandomModel:
+        fandom = await self.fandoms_repository.get(fandom_id)
+
+        if fandom is None:
+            raise FandomNotFound()
+        
+        return fandom
+    
     async def create_fandom_admin(self, fandom_data: FandomCreateSchema) -> FandomModel:
         fandom_data_dict = fandom_data.model_dump(exclude_unset=True)
         fandom_data_dict['slug'] = slugify(fandom_data.name)
