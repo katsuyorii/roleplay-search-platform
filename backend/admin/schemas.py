@@ -10,6 +10,11 @@ class AnnouncementAdminResponseSchema(AnnouncementResponseSchema):
     moderator_message: str | None = Field(default=None)
 
 
+class AnnouncementAdminUpdateSchema(BaseModel):
+    is_verify: bool | None = Field(default=None)
+    moderator_message: str | None = Field(default=None)
+
+
 class FandomResponseSchema(BaseModel):
     id: uuid.UUID
     name: str

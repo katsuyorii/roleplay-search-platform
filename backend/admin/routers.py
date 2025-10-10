@@ -9,7 +9,7 @@ from users.schemas import UserResponseSchema
 
 from .dependencies import get_admin_service
 from .services import AdminService
-from .schemas import AnnouncementAdminResponseSchema, FandomResponseSchema, FandomCreateSchema, FandomUpdateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
+from .schemas import AnnouncementAdminResponseSchema, AnnouncementAdminUpdateSchema, FandomResponseSchema, FandomCreateSchema, FandomUpdateSchema, TagResponseSchema, TagCreateSchema, NsfwFetishesTabooResponseSchema, NsfwFetishesTabooCreateSchema
 
 
 admin_router = APIRouter(
@@ -24,6 +24,18 @@ async def get_users(admin_service: AdminService = Depends(get_admin_service), sk
 @admin_router.get('/announcements', response_model=list[AnnouncementAdminResponseSchema])
 async def get_announcements(admin_service: AdminService = Depends(get_admin_service), announcements_filter: AnnouncementFilter = FilterDepends(AnnouncementFilter), skip: int| None = None, limit: int | None = None):
     return await admin_service.get_announcements_admin(announcements_filter, skip, limit)
+
+@admin_router.get('/announcements/{announcement_id}', response_model=AnnouncementAdminResponseSchema)
+async def get_announcement(announcement_id: uuid.UUID, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.get_announcement_admin(announcement_id)
+
+@admin_router.patch('/announcements/{announcement_id}', response_model=AnnouncementAdminResponseSchema)
+async def update_announcement(announcement_id: uuid.UUID, updated_announcement_data: AnnouncementAdminUpdateSchema, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.update_announcement_admin(announcement_id, updated_announcement_data)
+
+@admin_router.delete('/announcements/{announcement_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_announcement(announcement_id: uuid.UUID, admin_service: AdminService = Depends(get_admin_service)):
+    return await admin_service.delete_announcement_admin(announcement_id)
 
 @admin_router.get('/fandoms', response_model=list[FandomResponseSchema])
 async def get_fandoms(admin_service: AdminService = Depends(get_admin_service), skip: int| None = None, limit: int | None = None):

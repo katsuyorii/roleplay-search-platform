@@ -7,9 +7,10 @@ from users.repositories import UsersRepository
 from announcements.repositories import AnnouncementsRepository
 from announcements.models import FandomModel, TagModel, NsfwFetishTabooModel, AnnouncementModel
 from announcements.filters import AnnouncementFilter
+from announcements.exceptions import AnnouncementNotFound
 
 from announcements.repositories import FandomsRepository, TagsRepository, NsfwFetishTabooRepository
-from .schemas import FandomCreateSchema, FandomUpdateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema
+from .schemas import FandomCreateSchema, FandomUpdateSchema, TagCreateSchema, NsfwFetishesTabooCreateSchema, AnnouncementAdminUpdateSchema
 from .exceptions import FandomNotFound
 
 
@@ -30,6 +31,31 @@ class AdminService:
         announcements = await self.announcements_repository.get_all(announcements_filter, skip, limit)
 
         return announcements
+
+    async def get_announcement_admin(self, announcement_id: uuid.UUID) -> AnnouncementModel:
+        announcement = await self.announcements_repository.get(announcement_id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+        
+        return announcement
+    
+    async def update_announcement_admin(self, announcement_id: uuid.UUID, updated_announcement_data: AnnouncementAdminUpdateSchema) -> AnnouncementModel | None:
+        updated_announcement_data_dict = updated_announcement_data.model_dump(exclude_unset=True)
+        announcement = await self.announcements_repository.get(announcement_id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+        
+        return await self.announcements_repository.update(announcement, updated_announcement_data_dict)
+    
+    async def delete_announcement_admin(self, announcement_id: uuid.UUID) -> None:
+        announcement = await self.announcements_repository.get(announcement_id)
+
+        if announcement is None:
+            raise AnnouncementNotFound()
+        
+        await self.announcements_repository.delete(announcement)
     
     async def get_fandoms_admin(self, skip: int | None = None, limit: int | None = None) -> list[FandomModel]:
         fandoms = await self.fandoms_repository.get_all(skip, limit)
@@ -52,7 +78,7 @@ class AdminService:
 
         return new_fandom
     
-    async def update_fandom_admin(self, fandom_id: uuid.UUID, updated_fandom_data: FandomUpdateSchema) -> FandomModel:
+    async def update_fandom_admin(self, fandom_id: uuid.UUID, updated_fandom_data: FandomUpdateSchema) -> FandomModel | None:
         updated_fandom_data_dict = updated_fandom_data.model_dump(exclude_unset=True)
         updated_fandom_data_dict['slug'] = slugify(updated_fandom_data.name)
 
